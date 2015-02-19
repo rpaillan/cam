@@ -24,6 +24,9 @@ function loadFilesInfo() {
 		files = [];
 
 	files = fs.readdirSync(mainFolder)
+		.filter(function(dayFolder) {
+			return /^-?[0-9]{8}$/.test(dayFolder);
+		})
 		.map(function(dayFolder) {
 			return {
 				name: dayFolder,
@@ -63,7 +66,11 @@ function getLastImage() {
 	var mainFolder = config.images_folder,
 		files = [];
 
-	var lastDay = fs.readdirSync(mainFolder).pop();
+	var lastDay = fs.readdirSync(mainFolder)
+		.filter(function(dayFolder) {
+			return /^-?[0-9]{8}$/.test(dayFolder);
+		})
+		.pop();
 	var lastImage = fs.readdirSync(mainFolder + '/' + lastDay).pop();
 
 	return { day: lastDay, image: lastImage};
