@@ -53,11 +53,14 @@ checkip.getExternalIp().then(function (ip) {
 });
 
 
+
 //
 // Redirect HTTP ot HTTPS
 //
 // This simply redirects from the current insecure location to the encrypted location
 //
+
+/*
 insecureServer = http.createServer();
 insecureServer.on('request', function (req, res) {
   // TODO also redirect websocket upgrades
@@ -71,3 +74,4 @@ insecureServer.on('request', function (req, res) {
 insecureServer.listen(insecurePort, function(){
   console.log("\nRedirecting all http traffic to https\n");
 });
+*/
