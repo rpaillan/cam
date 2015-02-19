@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>CamViewer</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="lib/react-with-addons-0.12.2.js"></script>
+        <script src="lib/JSXTransformer-0.12.2.js"></script>
+        <script src="https://code.jquery.com/jquery-1.10.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
+    </head>
+    <body>
+        <div id="example"></div>
+        <script type="text/jsx">
+
+var TodoList = React.createClass({
+  getInitialState: function() {
+    return { lastImage: "", time: "", fileName: ""};
+  },
+  componentDidMount: function() {
+    setInterval(function() {
+      this.getLastImageUrl();
+    }.bind(this), 60000);
+    this.getLastImageUrl();
+  },
+  setLastImage: function(data) {
+    var image_path = "/image/" + data.day + '/' + data.image;
+
+    var dp = data.image.match(/([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/);
+    var dateW = dp[1] + '-' + dp[2] + '-' + dp[3];
+    var hourW = dp[4] + ':' + dp[5] + ':' + dp[6];
+
+    var dateImage = new Date(dp[1],dp[2]-1,dp[3],dp[4],dp[5],dp[6]);
+    var diff = Date.now() - dateImage.getTime();
+    diff = (diff / 1000 / 60).toFixed(2);
+
+
+    if (this.state.lastImage !== image_path) {
+    this.setState({
+         lastImage: image_path,
+         time: dateImage.toString()  + "  --  hace " + diff + ' minutos',
+         fileName: data.image
+      })
+    }
+  },
+  getLastImageUrl: function() {
+    var me = this;
+    $.ajax({
+      type: "POST",
+      url: '/images/last',
+      success: function(data) {
+          me.setLastImage(data);
+      },
+      dataType: 'json'
+    });
+  },
+
+  render: function() {
+    return (
+      <div>
+        <h3>{this.state.fileName}</h3>
+        <h3>{this.state.time}</h3>
+        <img className="image" src={this.state.lastImage} />
+      </div>
+    );
+  }
+});
+
+React.render(<TodoList />, document.getElementById("example"));
+        </script>
+    </body>
+</html>

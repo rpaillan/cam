@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>CamViewer</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script src="lib/react-with-addons-0.12.2.js"></script>
+        <script src="lib/JSXTransformer-0.12.2.js"></script>
+        <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
+
+    </head>
+    <body>
+        <div id="example"></div>
+        <style type="text/css">
+            .example-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+}
+        </style>
+        <script type="text/jsx">
+           var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+var TodoList = React.createClass({
+  getInitialState: function() {
+    return {items: ['hello', 'world', 'click', 'me']};
+  },
+  handleAdd: function() {
+    var newItems =
+      this.state.items.concat([prompt('Enter some text')]);
+    this.setState({items: newItems});
+  },
+  handleRemove: function(i) {
+    var newItems = this.state.items;
+    newItems.splice(i, 1);
+    this.setState({items: newItems});
+  },
+  render: function() {
+    var items = this.state.items.map(function(item, i) {
+      return (
+        <div key={item} onClick={this.handleRemove.bind(this, i)}>
+          {item}
+        </div>
+      );
+    }.bind(this));
+    return (
+      <div>
+        <button onClick={this.handleAdd}>Add Item</button>
+        <ReactCSSTransitionGroup transitionName="example">
+          {items}
+        </ReactCSSTransitionGroup>
+      </div>
+    );
+  }
+});
+
+    React.render(<TodoList />, document.getElementById("example"));
+        </script>
+    </body>
+</html>
