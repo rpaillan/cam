@@ -4,8 +4,8 @@
 var https = require('https'),
 	http = require('http'),
 	path = require('path'),
-	port = process.argv[2] || 443,
-	//insecurePort = process.argv[3] || 4080,
+	port = 443,
+	insecurePort = 80,
 	fs = require('fs'),
 	path = require('path'),
 	checkip = require('check-ip-address'),
@@ -59,11 +59,8 @@ checkip.getExternalIp().then(function (ip) {
 //
 // This simply redirects from the current insecure location to the encrypted location
 //
-
-/*
 insecureServer = http.createServer();
 insecureServer.on('request', function (req, res) {
-  // TODO also redirect websocket upgrades
   res.setHeader(
     'Location',
     'https://' + req.headers.host.replace(/:\d+/, ':' + port) + req.url
@@ -74,4 +71,3 @@ insecureServer.on('request', function (req, res) {
 insecureServer.listen(insecurePort, function(){
   console.log("\nRedirecting all http traffic to https\n");
 });
-*/
