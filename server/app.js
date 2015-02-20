@@ -1,23 +1,17 @@
 var express = require('express'),
-	fs = require('fs');
+	fs = require('fs'),
+	config;
 
-module.exports.create = function(server, host, port, publicDir) {
+module.exports.create = function(server, host, port, publicDir, generalConfig) {
+	config = generalConfig;
 	var app = express();
 	app.use(express.static(publicDir));
-	loadConfigs();
-	loadFilesInfo();
+	//loadFilesInfo();
 	bind(app);
 	return app;
 };
 
-
-var config = {};
 var rawFiles = [];
-
-function loadConfigs() {
-	config = JSON.parse(fs.readFileSync('../../config.json'));
-	console.log('CONFIG:', config);
-}
 
 function loadFilesInfo() {
 	var mainFolder = config.images_folder,

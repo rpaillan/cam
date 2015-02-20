@@ -5,7 +5,7 @@ var https = require('https'),
 	http = require('http'),
 	path = require('path'),
 	port = process.argv[2] || 443,
-	insecurePort = process.argv[3] || 4080,
+	//insecurePort = process.argv[3] || 4080,
 	fs = require('fs'),
 	path = require('path'),
 	checkip = require('check-ip-address'),
@@ -13,16 +13,18 @@ var https = require('https'),
 	insecureServer,
 	options,
 	certsPath = path.join(__dirname, 'certs', 'server'),
-	caCertsPath = path.join(__dirname, 'certs', 'ca');
+  config = JSON.parse(fs.readFileSync('../../config.json'));
 
+
+console.log('CONFIG:', config);
 
 //
 // SSL Certificates
 //
 options = {
-	key: fs.readFileSync(path.join(certsPath, 'my-server.key.pem')),
-	ca: [ fs.readFileSync(path.join(caCertsPath, 'my-root-ca.crt.pem')) ],
-	cert: fs.readFileSync(path.join(certsPath, 'my-server.crt.pem')),
+	key: fs.readFileSync(config.certs_key_pem),  //path.join(config.certs_key_pem, 'my-server.key.pem')),
+	ca: [ fs.readFileSync(config.certs_ca_cert_pem) ],  //path.join(caCertsPath, 'my-root-ca.crt.pem')) ],
+	cert: fs.readFileSync(config.certs_cert_pem),   //path.join(certsPath, 'my-server.crt.pem')),
 	requestCert: false,
 	rejectUnauthorized: false,
 };
@@ -33,22 +35,20 @@ options = {
 //
 server = https.createServer(options);
 checkip.getExternalIp().then(function (ip) {
-  var host = ip || 'local.helloworld3000.com';
+  var host = ip || 'localhost';
 
   function listen(app) {
     server.on('request', app);
     server.listen(port, function () {
       port = server.address().port;
-      console.log('Listening on https://127.0.0.1:' + port);
-      console.log('Listening on https://local.helloworld3000.com:' + port);
-      if (ip) {
-        console.log('Listening on https://' + ip + ':' + port);
-      }
+      //if (ip) {
+        console.log('Listening on https://' + host + ':' + port);
+      //}
     });
   }
 
   var publicDir = path.join(__dirname, '../site');
-  var app = require('./app').create(server, host, port, publicDir);
+  var app = require('./app').create(server, host, port, publicDir, config);
   listen(app);
 });
 
