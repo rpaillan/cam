@@ -11,10 +11,30 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
     </head>
     <body>
-        <div id="example"></div>
+        <div class="main" id="example"></div>
+
+        <style type="text/css">
+
+        .main {
+          font-family: verdana;
+        }
+
+        .camera {
+          display: inline-block;
+          margin: 5px;
+        }
+
+        .image {
+          border: 1px solid black;
+          padding: 3px;
+        }
+
+        </style>
+
+
         <script type="text/jsx">
 
-var TodoList = React.createClass({
+var Cameras = React.createClass({
   getInitialState: function() {
     return { cams: [] };
   },
@@ -40,8 +60,9 @@ var TodoList = React.createClass({
       delta = (delta / 1000 / 60).toFixed(2);
 
       newState.cams.push({
+        camName: cam,
         image: image_path,
-        time: dateImage.toString()  + "  --  hace " + delta + ' minutos',
+        time: dateImage.toLocaleString()  + " (hace " + delta + ' minutos)',
         fileName: image
       })
     }
@@ -63,9 +84,9 @@ var TodoList = React.createClass({
 
     var images = this.state.cams.map(function(cam) {
       return (
-        <div>
-          <h3>{cam.fileName}</h3>
-          <h3>{cam.time}</h3>
+        <div className="camera">
+          <h3>{cam.camName}</h3>
+          <p>{cam.time}</p>
           <img className="image" src={cam.image} />
         </div>
       )
@@ -78,7 +99,7 @@ var TodoList = React.createClass({
   }
 });
 
-React.render(<TodoList />, document.getElementById("example"));
+React.render(<Cameras />, document.getElementById("example"));
         </script>
     </body>
 </html>
