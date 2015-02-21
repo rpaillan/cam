@@ -56,18 +56,31 @@ function loadFilesInfo() {
 	    */
 }
 
+var cams = {
+	cam1: "00_D6_17_07_3C_BB_JWEV",
+	cam2: "00_D7_16_06_38_5F_JWEV"
+};
+
 function getLastImage() {
 	var mainFolder = config.images_folder,
-		files = [];
+		images = {};
 
 	var lastDay = fs.readdirSync(mainFolder)
 		.filter(function(dayFolder) {
 			return /^-?[0-9]{8}$/.test(dayFolder);
-		})
-		.pop();
-	var lastImage = fs.readdirSync(mainFolder + '/' + lastDay).pop();
+		}).pop();
+	var lastImages = fs.readdirSync(mainFolder + '/' + lastDay);
 
-	return { day: lastDay, image: lastImage};
+	for(var cam in cams) {
+		var camId = cams[cam];
+		lastImages.forEach(function(fileName) {
+			if (fileName.indexOf(camId) === 0) {
+				images[cam] = fileName;
+			}
+		});
+	}
+
+	return { day: lastDay, cams: images};
 }
 
 function bind(app) {

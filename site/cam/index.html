@@ -16,52 +16,63 @@
 
 var TodoList = React.createClass({
   getInitialState: function() {
-    return { lastImage: "", time: "", fileName: ""};
+    return { cams: [] };
   },
   componentDidMount: function() {
     setInterval(function() {
-      this.getLastImageUrl();
+      this.getLastImages();
     }.bind(this), 60000);
-    this.getLastImageUrl();
+    this.getLastImages();
   },
-  setLastImage: function(data) {
-    var image_path = "/image/" + data.day + '/' + data.image;
+  setLastImages: function(data) {
+    console.log(data);
 
-    var dp = data.image.match(/([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/);
-    var dateW = dp[1] + '-' + dp[2] + '-' + dp[3];
-    var hourW = dp[4] + ':' + dp[5] + ':' + dp[6];
+    var newState = { cams: [] };
 
-    var dateImage = new Date(dp[1],dp[2]-1,dp[3],dp[4],dp[5],dp[6]);
-    var diff = Date.now() - dateImage.getTime();
-    diff = (diff / 1000 / 60).toFixed(2);
+    for(var cam in data.cams) {
+      var image = data.cams[cam];
+      var image_path = "/image/" + data.day + '/' + image;
 
+      var info = image.match(/([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/);
 
-    if (this.state.lastImage !== image_path) {
-    this.setState({
-         lastImage: image_path,
-         time: dateImage.toString()  + "  --  hace " + diff + ' minutos',
-         fileName: data.image
+      var dateImage = new Date(info[1], info[2]-1, info[3], info[4], info[5], info[6]);
+      var delta = Date.now() - dateImage.getTime();
+      delta = (delta / 1000 / 60).toFixed(2);
+
+      newState.cams.push({
+        image: image_path,
+        time: dateImage.toString()  + "  --  hace " + delta + ' minutos',
+        fileName: image
       })
     }
+    this.setState(newState);
   },
-  getLastImageUrl: function() {
+  getLastImages: function() {
     var me = this;
     $.ajax({
       type: "POST",
       url: '/images/last',
       success: function(data) {
-          me.setLastImage(data);
+          me.setLastImages(data);
       },
       dataType: 'json'
     });
   },
 
   render: function() {
+
+    var images = this.state.cams.map(function(cam) {
+      return (
+        <div>
+          <h3>{cam.fileName}</h3>
+          <h3>{cam.time}</h3>
+          <img className="image" src={cam.image} />
+        </div>
+      )
+    });
     return (
       <div>
-        <h3>{this.state.fileName}</h3>
-        <h3>{this.state.time}</h3>
-        <img className="image" src={this.state.lastImage} />
+        {images}
       </div>
     );
   }
