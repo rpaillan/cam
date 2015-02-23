@@ -63,7 +63,7 @@ insecureServer = http.createServer();
 insecureServer.on('request', function (req, res) {
   res.setHeader(
     'Location',
-    'https://' + req.headers.host.replace(/:\d+/, ':' + port) + req.url
+    'https://' + (req.headers.host || "www.paillan.net").replace(/:\d+/, ':' + port) + req.url
   );
   res.statusCode = 302;
   res.end();
