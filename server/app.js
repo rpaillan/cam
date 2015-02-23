@@ -1,15 +1,43 @@
 var express = require('express'),
 	fs = require('fs'),
+	basicAuth = require('basic-auth'),
 	config;
 
 module.exports.create = function(server, host, port, publicDir, generalConfig) {
 	config = generalConfig;
 	var app = express();
+
+	security(app);
+
 	app.use(express.static(publicDir));
 	//loadFilesInfo();
 	bind(app);
 	return app;
 };
+
+function security(app) {
+	var auth = function(req, res, next) {
+		function unauthorized(res) {
+			res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+			return res.sendStatus(401);
+		}
+
+		var user = basicAuth(req);
+
+		if (!user || !user.name || !user.pass) {
+			return unauthorized(res);
+		}
+
+		if (user.name === config.user.name && user.pass === config.user.password) {
+			return next();
+		} else {
+			return unauthorized(res);
+		}
+	};
+
+	// bind
+	app.use(auth);
+}
 
 var rawFiles = [];
 
@@ -71,7 +99,7 @@ function getLastImage() {
 		}).pop();
 	var lastImages = fs.readdirSync(mainFolder + '/' + lastDay);
 
-	for(var cam in cams) {
+	for (var cam in cams) {
 		var camId = cams[cam];
 		lastImages.forEach(function(fileName) {
 			if (fileName.indexOf(camId) === 0) {
@@ -80,7 +108,10 @@ function getLastImage() {
 		});
 	}
 
-	return { day: lastDay, cams: images};
+	return {
+		day: lastDay,
+		cams: images
+	};
 }
 
 function bind(app) {
